@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { Wand2 } from "lucide-react";
 
 const PREAMBLE = `As an AI CS instructor:
@@ -87,6 +88,7 @@ const formSchema = z.object({
 });
 
 export const BotForm = ({ categories, initialData }: BotFormProps) => {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
@@ -110,13 +112,19 @@ export const BotForm = ({ categories, initialData }: BotFormProps) => {
         //Create companion functionality
         await axios.post("/api/companion", values);
       }
+      toast({
+        description: "Success",
+      });
     } catch (error) {
-      console.log(error, "SOMETHING WENT WRONG");
+      toast({
+        variant: "destructive",
+        description: "Something went wrong",
+      });
     }
   };
 
   return (
-    <div className="h-full p-4 space-y-2 max-w-3xl mx-auto">
+    <div className="h-full p-4 space-y-2 max-w-4xl mx-auto">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

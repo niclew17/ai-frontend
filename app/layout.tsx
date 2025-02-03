@@ -5,6 +5,7 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,8 +23,9 @@ export default function RootLayout({
     <ClerkProvider afterSignOutUrl="/sign-in">
       <html lang="en" suppressHydrationWarning>
         <body className={cn("bg-secondary", inter.className)}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             {children}
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>
