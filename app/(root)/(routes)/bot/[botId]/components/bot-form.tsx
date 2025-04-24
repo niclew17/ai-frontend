@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Wand2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const PREAMBLE = `As an AI CS instructor:
 - always respond with short, brief, concise responses (the less you say, the more it helps the students)
@@ -73,7 +74,7 @@ const formSchema = z.object({
   description: z.string().min(1, {
     message: "Description is required",
   }),
-  instructions: z.string().min(200, {
+  instruction: z.string().min(200, {
     message: "Instructions requires at least 200 characters",
   }),
   seed: z.string().min(200, {
@@ -88,13 +89,14 @@ const formSchema = z.object({
 });
 
 export const BotForm = ({ categories, initialData }: BotFormProps) => {
+  const router = useRouter();
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
       name: "",
       description: "",
-      instructions: "",
+      instruction: "",
       seed: "",
       src: "",
       categoryId: undefined,
@@ -106,15 +108,18 @@ export const BotForm = ({ categories, initialData }: BotFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       if (initialData) {
-        //Update companion functionality
-        await axios.patch(`/api/companion/${initialData.id}`, values);
+        //Update bot functionality
+        await axios.patch(`/api/bot/${initialData.id}`, values);
       } else {
-        //Create companion functionality
-        await axios.post("/api/companion", values);
+        //Create bot functionality
+        await axios.post("/api/bot", values);
       }
       toast({
         description: "Success",
       });
+
+      router.refresh();
+      router.push("/");
     } catch (error) {
       toast({
         variant: "destructive",
@@ -242,7 +247,7 @@ export const BotForm = ({ categories, initialData }: BotFormProps) => {
             <Separator className="bg-primary/10" />
           </div>
           <FormField
-            name="instructions"
+            name="instruction"
             control={form.control}
             render={({ field }) => (
               <FormItem className="col-span-2 md: col-span-1">
@@ -289,7 +294,7 @@ export const BotForm = ({ categories, initialData }: BotFormProps) => {
           />
           <div className="w-full flex justify-center">
             <Button size="lg" disabled={isLoading}>
-              {initialData ? "Edit your companion" : "Create your companion"}
+              {initialData ? "Edit your bot" : "Create your bot"}
               <Wand2 className="w-4 h-4 ml-2" />
             </Button>
           </div>
